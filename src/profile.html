@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile - Chess Superpowers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/profile.css">
+</head>
+<body>
+    <div class="profile-container" id="login-form">
+        <div class="profile-logo">
+            <img src="assets/profile.png" alt="Profile">
+        </div>
+        <h2>Login</h2>
+        <input type="text" placeholder="Username" id="login-username" autocomplete="username">
+        <div class="password-field">
+            <input type="password" placeholder="Password" id="login-password" autocomplete="current-password">
+            <span class="toggle-password" id="login-toggle-password" title="Show/Hide Password">
+                <svg id="login-eye" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="5"/><circle cx="12" cy="12" r="2"/></svg>
+            </span>
+        </div>
+        <button id="login-btn">Login</button>
+        <div>
+            Don't have an account?
+            <span class="switch-link" id="show-register">Register here</span>
+        </div>
+    </div>
+    <div class="profile-container" id="register-form" style="display:none;">
+        <div class="profile-logo">
+            <img src="assets/profile.png" alt="Profile">
+        </div>
+        <h2>Register</h2>
+        <input type="text" placeholder="Email" id="register-email" autocomplete="email" required>
+        <div class="password-field">
+            <input type="password" placeholder="Password" id="register-password" autocomplete="new-password" required>
+            <span class="toggle-password" id="register-toggle-password" title="Show/Hide Password">
+                <svg id="register-eye" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="5"/><circle cx="12" cy="12" r="2"/></svg>
+            </span>
+        </div>
+        <div class="password-field">
+            <input type="password" placeholder="Confirm Password" id="register-password-confirm" autocomplete="new-password" required>
+            <span class="toggle-password" id="register-toggle-password-confirm" title="Show/Hide Password">
+                <svg id="register-eye-confirm" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="5"/><circle cx="12" cy="12" r="2"/></svg>
+            </span>
+        </div>
+        <div id="register-error" style="color:#e53935;min-height:22px;font-size:0.98em;"></div>
+        <button id="register-btn">Register</button>
+        <div>
+            Already have an account?
+            <span class="switch-link" id="show-login">Login here</span>
+        </div>
+    </div>
+    <script>
+        // Simple toggle between login and register forms
+        document.getElementById('show-register').onclick = function() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = '';
+        };
+        document.getElementById('show-login').onclick = function() {
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('login-form').style.display = '';
+        };
+        // Dummy handlers for login/register
+        document.getElementById('login-btn').onclick = function() {
+            alert('Logged in (demo)');
+            // After successful login/register
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('profile', JSON.stringify({
+                username: document.getElementById('login-username').value || document.getElementById('register-email').value,
+                wins: 0,
+                losses: 0
+            }));
+            window.location.href = "index.html";
+        };
+        document.getElementById('register-btn').onclick = function() {
+            const email = document.getElementById('register-email').value.trim();
+            const pw = document.getElementById('register-password').value;
+            const pw2 = document.getElementById('register-password-confirm').value;
+            const error = document.getElementById('register-error');
+            error.textContent = '';
+
+            // Simple email and password validation
+            if (!email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
+                error.textContent = "Please enter a valid email address.";
+                return;
+            }
+            if (pw.length < 6) {
+                error.textContent = "Password must be at least 6 characters.";
+                return;
+            }
+            if (pw !== pw2) {
+                error.textContent = "Passwords do not match.";
+                return;
+            }
+            alert('Registered (demo)');
+            // After successful login/register
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('profile', JSON.stringify({
+                username: document.getElementById('login-username').value || document.getElementById('register-email').value,
+                wins: 0,
+                losses: 0
+            }));
+            window.location.href = "index.html";
+        };
+        // SVGs for eye (show) and eye-off (hide)
+        const eyeSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="5"/><circle cx="12" cy="12" r="2"/></svg>`;
+        const eyeOffSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="5"/><circle cx="12" cy="12" r="2"/><line x1="3" y1="3" x2="21" y2="21"/></svg>`;
+
+        document.getElementById('login-toggle-password').onclick = function() {
+            const pw = document.getElementById('login-password');
+            const eye = document.getElementById('login-eye');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                this.innerHTML = eyeOffSVG;
+            } else {
+                pw.type = 'password';
+                this.innerHTML = eyeSVG;
+            }
+            this.querySelector('svg').id = 'login-eye';
+        };
+        document.getElementById('register-toggle-password').onclick = function() {
+            const pw = document.getElementById('register-password');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                this.innerHTML = eyeOffSVG;
+            } else {
+                pw.type = 'password';
+                this.innerHTML = eyeSVG;
+            }
+            this.querySelector('svg').id = 'register-eye';
+        };
+        document.getElementById('register-toggle-password-confirm').onclick = function() {
+            const pw = document.getElementById('register-password-confirm');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                this.innerHTML = eyeOffSVG;
+            } else {
+                pw.type = 'password';
+                this.innerHTML = eyeSVG;
+            }
+            this.querySelector('svg').id = 'register-eye-confirm';
+        };
+    </script>
+</body>
+</html>

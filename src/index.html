@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess with Superpowers</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+    <header>
+        <h1>Chess with Superpowers</h1>
+        <p>Experience chess like never before with unique superpowers!</p>
+        <button id="profile-btn" class="profile-btn" title="Profile">
+            <img src="assets/profile.png" alt="Profile" />
+        </button>
+        <div id="profile-dropdown" class="profile-dropdown" style="display:none;">
+            <div id="profile-dropdown-info"></div>
+            <button id="profile-view-btn" style="display:none;">Profile</button>
+            <button id="profile-logout-btn" style="display:none;">Logout</button>
+            <button id="profile-login-btn" style="display:none;">Login / Register</button>
+        </div>
+    </header>
+    <main>
+        <div id="superpower-charge-container">
+            <label for="superpower-charge">Superpower Charge:</label>
+            <progress id="superpower-charge" value="0" max="5"></progress>
+            <span id="superpower-charge-text">0/5</span>
+        </div>
+        <div class="main-flex">
+            <aside id="rules">
+                <h2>Rules</h2>
+                <ul>
+                    <li><b>King:</b> Moves one square in any direction.</li>
+                    <li><b>Queen:</b> Moves any number of squares diagonally, horizontally, or vertically.</li>
+                    <li><b>Rook:</b> Moves any number of squares horizontally or vertically.</li>
+                    <li><b>Bishop:</b> Moves any number of squares diagonally.</li>
+                    <li><b>Knight:</b> Moves in an "L" shape.</li>
+                    <li><b>Pawn:</b> Moves one square forward, two on first move, captures diagonally.</li>
+                    <li><b>Special:</b> Castling, En Passant, Check, Checkmate.</li>
+                </ul>
+            </aside>
+            <div>
+                <div id="chess-board" class="chess-board"></div>
+                <button id="superpower-button">Activate Superpower</button>
+            </div>
+            <aside id="superpowers">
+                <h2>Available Superpowers</h2>
+                <ul>
+                    <li title="Swap the positions of any two of your pieces.">Piece Swap</li>
+                    <li title="Take an extra move immediately after your turn.">Extra Move</li>
+                </ul>
+            </aside>
+        </div>
+        <div style="text-align:center; margin-bottom: 10px;">
+            <label>
+                <input type="checkbox" id="show-moves-toggle" />
+                Show Moves
+            </label>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Chess with Superpowers. All rights reserved.</p>
+    </footer>
+    <div id="profile-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="close-profile-modal">&times;</span>
+            <h2>Register or Login</h2>
+            <p>Welcome! Please register or login to continue.</p>
+            <button id="continue-profile">Continue</button>
+        </div>
+    </div>
+    <script src="scripts/app.js"></script>
+</body>
+</html>

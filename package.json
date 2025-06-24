@@ -1,0 +1,19 @@
+{
+  "name": "chess-superpowers",
+  "version": "1.0.0",
+  "description": "A chess game with superpowers that enhances gameplay.",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "live-server src"
+  },
+  "keywords": [
+    "chess",
+    "game",
+    "superpowers"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "live-server": "^1.2.1"
+  }
+}

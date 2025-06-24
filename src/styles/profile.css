@@ -1,0 +1,103 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #232946 0%, #16161a 100%);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+.profile-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background: #232946;
+    color: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(60,60,120,0.15);
+    padding: 32px 24px;
+    text-align: center;
+}
+.profile-container h2 {
+    margin-top: 0;
+    color: #3a3a6a;
+}
+.profile-container input[type="text"],
+.profile-container input[type="password"],
+.profile-container input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 18px 0;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #16161a;
+    color: #fff;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+.profile-container button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(90deg, #4f8cff 60%, #232946 100%);
+    color: #fff;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+.profile-container button:hover {
+    background: linear-gradient(90deg, #232946 60%, #4f8cff 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+.profile-container .switch-link {
+    color: #4fc3f7;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.98em;
+}
+.profile-logo {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 18px;
+    border-radius: 50%;
+    background: #16161a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+.profile-logo img {
+    width: 48px;
+    height: 48px;
+}
+.password-field {
+    position: relative;
+    width: 100%;
+    margin: 10px 0 18px 0;
+    display: flex;
+    align-items: center;
+}
+.password-field input[type="password"],
+.password-field input[type="text"] {
+    width: 100%;
+    padding-right: 38px;
+    box-sizing: border-box;
+    margin: 0;
+}
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 25%;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+.toggle-password svg {
+    display: block;
+    transition: stroke 0.2s;
+}
+.toggle-password:hover svg {
+    stroke: #4fc3f7;
+}
