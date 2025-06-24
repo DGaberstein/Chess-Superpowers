@@ -1,5 +1,9 @@
 # Chess with Superpowers
 
+Play online: [chess-superpowers.netlify.app](https://chess-superpowers.netlify.app)
+
+Enjoy playing
+
 Welcome to the Chess with Superpowers project! This website allows users to play a unique version of chess where each piece has special abilities, adding an exciting twist to the classic game.
 
 ## Project Structure
