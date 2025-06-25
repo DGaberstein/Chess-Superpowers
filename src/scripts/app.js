@@ -106,8 +106,15 @@ function selectSquare(row, col) {
     const piece = board[from.row][from.col];
     if (!piece) return;
 
+    console.log('Trying to move', piece, 'from', from, 'to', to);
+    console.log('Target square contains:', board[to.row][to.col]);
+    
     const legalMoves = getLegalMoves(from.row, from.col, board, turn, moveHistory);
+    console.log('Legal moves for this piece:', legalMoves);
+    
     const isLegal = legalMoves.some(m => m.row === to.row && m.col === to.col);
+    console.log('Is this move legal?', isLegal);
+    
     if (!isLegal) {
         renderChessBoard(board);
         const squares = chessBoard.querySelectorAll('.square');
@@ -149,6 +156,14 @@ function selectSquare(row, col) {
     board[to.row][to.col] = piece;
     board[from.row][from.col] = '';
     moveHistory.push({ from, to, piece, captured: targetPiece });
+
+    // If superpower was active, consume the charge now that a move was made
+    if (superpowerActive) {
+        superpowerActive = false;
+        superpowerCharge = 0;
+        chessBoard.classList.remove('superpower');
+        updateSuperpowerChargeDisplay();
+    }
 
     // Switch turn
     turn = turn === 'white' ? 'black' : 'white';
@@ -202,13 +217,25 @@ function aiMove() {
 function updateSuperpowerChargeDisplay() {
     chargeBar.value = superpowerCharge;
     chargeText.textContent = `${superpowerCharge}/${chargeMax}`;
-    superpowerButton.disabled = superpowerCharge < chargeMax;
+    
+    // Update button state based on charge and superpower status
+    if (superpowerActive) {
+        superpowerButton.disabled = false;
+        superpowerButton.textContent = 'Deactivate Superpower';
+        superpowerButton.classList.add('active');
+    } else {
+        superpowerButton.disabled = superpowerCharge < chargeMax;
+        superpowerButton.textContent = 'Activate Superpower';
+        superpowerButton.classList.remove('active');
+    }
 }
 
 function getLegalMoves(row, col, board, color, moveHistory, skipKingCheck) {
     const piece = board[row][col];
     if (!piece) return [];
     let moves = [];
+    
+    // Get base moves for the piece
     if (piece === '♙') moves = pawnMoves(row, col, board, 'white', moveHistory);
     else if (piece === '♟') moves = pawnMoves(row, col, board, 'black', moveHistory);
     else if (piece === '♖') moves = rookMoves(row, col, board, 'white');
@@ -221,6 +248,12 @@ function getLegalMoves(row, col, board, color, moveHistory, skipKingCheck) {
     else if (piece === '♛') moves = queenMoves(row, col, board, 'black');
     else if (piece === '♔') moves = kingMoves(row, col, board, 'white');
     else if (piece === '♚') moves = kingMoves(row, col, board, 'black');
+    
+    // Apply superpower enhancements if active and it's the player's turn
+    if (superpowerActive && color === 'white') {
+        moves = applySuperpower(piece, row, col, moves, board, color);
+    }
+    
     // Filter out moves that would leave king in check (unless skipKingCheck is true)
     if (!skipKingCheck) {
         moves = moves.filter(move => !wouldLeaveKingInCheck(row, col, move.row, move.col, board, color));
@@ -228,10 +261,66 @@ function getLegalMoves(row, col, board, color, moveHistory, skipKingCheck) {
     return moves;
 }
 
+function applySuperpower(piece, row, col, baseMoves, board, color) {
+    let enhancedMoves = [...baseMoves];
+    
+    switch (piece) {
+        case '♙': // White Pawn - Can move like a knight once
+            enhancedMoves.push(...knightMoves(row, col, board, color));
+            break;
+        case '♖': // White Rook - Can move diagonally like a bishop
+            enhancedMoves.push(...bishopMoves(row, col, board, color));
+            break;
+        case '♘': // White Knight - Can move like a king (adjacent squares)
+            enhancedMoves.push(...kingMoves(row, col, board, color));
+            break;
+        case '♗': // White Bishop - Can move like a rook
+            enhancedMoves.push(...rookMoves(row, col, board, color));
+            break;
+        case '♕': // White Queen - Can teleport to any empty square within 3 squares
+            for (let r = Math.max(0, row - 3); r <= Math.min(7, row + 3); r++) {
+                for (let c = Math.max(0, col - 3); c <= Math.min(7, col + 3); c++) {
+                    if (r !== row || c !== col) {
+                        if (!board[r][c] || isOpponent(board[r][c], color)) {
+                            enhancedMoves.push({ row: r, col: c });
+                        }
+                    }
+                }
+            }
+            break;
+        case '♔': // White King - Can move 2 squares in any direction
+            for (let dr = -2; dr <= 2; dr++) {
+                for (let dc = -2; dc <= 2; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+                    const nr = row + dr, nc = col + dc;
+                    if (inBounds(nr, nc) && (!board[nr][nc] || isOpponent(board[nr][nc], color))) {
+                        enhancedMoves.push({ row: nr, col: nc });
+                    }
+                }
+            }
+            break;
+    }
+    
+    // Remove duplicates
+    const uniqueMoves = [];
+    const seen = new Set();
+    for (const move of enhancedMoves) {
+        const key = `${move.row},${move.col}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueMoves.push(move);
+        }
+    }
+    
+    return uniqueMoves;
+}
+
 function pawnMoves(row, col, board, color, moveHistory) {
     const dir = color === 'white' ? -1 : 1;
     const startRow = color === 'white' ? 6 : 1;
     const moves = [];
+    console.log('Calculating pawn moves for', color, 'pawn at', row, col);
+    
     // Forward move
     if (inBounds(row + dir, col) && !board[row + dir][col]) {
         moves.push({ row: row + dir, col });
@@ -240,13 +329,18 @@ function pawnMoves(row, col, board, color, moveHistory) {
             moves.push({ row: row + 2 * dir, col });
         }
     }
+    
     // Captures
     for (let dc of [-1, 1]) {
         const nr = row + dir, nc = col + dc;
+        console.log('Checking capture at', nr, nc, 'piece there:', board[nr] ? board[nr][nc] : 'out of bounds');
         if (inBounds(nr, nc) && board[nr][nc] && isOpponent(board[nr][nc], color)) {
+            console.log('Adding capture move to', nr, nc);
             moves.push({ row: nr, col: nc });
         }
     }
+    
+    console.log('Pawn moves generated:', moves);
     // TODO: En passant
     return moves;
 }
@@ -354,14 +448,50 @@ function initChessBoard() {
 }
 
 function toggleSuperpower() {
-    if (superpowerCharge < chargeMax) return;
-    superpowerActive = !superpowerActive;
-    superpowerButton.textContent = superpowerActive ? 'Deactivate Superpower' : 'Activate Superpower';
-    chessBoard.classList.toggle('superpower', superpowerActive);
-    if (superpowerActive) {
-        superpowerCharge = 0; // Reset after use
-        updateSuperpowerChargeDisplay();
+    if (!superpowerActive && superpowerCharge < chargeMax) {
+        return; // Can't activate if charge isn't full
     }
+    
+    superpowerActive = !superpowerActive;
+    
+    if (superpowerActive) {
+        // Activating superpower - don't consume charge yet
+        chessBoard.classList.add('superpower');
+        showSuperpowerMessage("Superpower activated! Make your move or deactivate to save the charge.");
+    } else {
+        // Deactivating superpower - keep the charge since no move was made
+        chessBoard.classList.remove('superpower');
+        showSuperpowerMessage("Superpower deactivated. Charge preserved.");
+    }
+    
+    updateSuperpowerChargeDisplay();
+}
+
+function showSuperpowerMessage(message) {
+    // Create a temporary message display
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        font-weight: bold;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    `;
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+    
+    // Remove message after 3 seconds
+    setTimeout(() => {
+        if (messageDiv.parentNode) {
+            messageDiv.parentNode.removeChild(messageDiv);
+        }
+    }, 3000);
 }
 
 showMovesToggle.addEventListener('change', function() {

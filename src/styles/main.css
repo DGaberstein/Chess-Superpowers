@@ -198,6 +198,17 @@ button#superpower-button:before {
     font-size: 1.1em;
 }
 
+button#superpower-button.active {
+    background: linear-gradient(90deg, #ff6b35 60%, #ffd700 100%);
+    box-shadow: 0 0 15px #ff6b35, 0 2px 8px #b7b7d822;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 15px #ff6b35, 0 2px 8px #b7b7d822; }
+    50% { box-shadow: 0 0 25px #ff6b35, 0 0 35px #ffd700, 0 2px 8px #b7b7d822; }
+}
+
 button#startGame:before {
     content: "♻️";
     margin-right: 8px;
